@@ -8,7 +8,24 @@ A bot that reviews PRs of other bots and merges them automatically if they passe
 ## Status
 This is a work in progress
 
+### Usage
 
+#### Dry run: Display all PRs that can be auto-merged
+```
+docker run -e BITBUCKET_TOKEN vaslabs/reviewer:0.0.2\
+     dry-run\
+     --username ${BITBUCKET_USERNAME}\
+     --password-env BITBUCKET_TOKEN\
+     --api-uri https://api.bitbucket.org/2.0
+ ```
+ #### Merge all: successful PRs successful build
+ ```
+docker run -e BITBUCKET_TOKEN vaslabs/reviewer:0.0.2\
+     merge-all\
+     --username ${BITBUCKET_USERNAME}\
+     --password-env BITBUCKET_TOKEN\
+     --api-uri https://api.bitbucket.org/2.0
+ ```
 ## Goals
 1. Integrate bitbucket
 2. Integrate gitlab
