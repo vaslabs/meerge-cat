@@ -2,7 +2,7 @@ name := "reviewer"
 
 version := "0.1"
 
-scalaVersion := "2.13.3"
+scalaVersion in ThisBuild := "2.13.3"
 import ReleaseTransformations._
 
 lazy val reviewer = (project in file("."))
@@ -38,7 +38,7 @@ val compilerFlags = Seq(
   "-Xfatal-warnings"
 )
 
-val releaseSettings = Seq(
+lazy val releaseSettings = Seq(
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,                            // : ReleaseStep
     inquireVersions,                                      // : ReleaseStep
@@ -47,7 +47,7 @@ val releaseSettings = Seq(
     setReleaseVersion,                                    // : ReleaseStep
     commitReleaseVersion,                                 // : ReleaseStep, performs the initial git checks
     tagRelease,                                           // : ReleaseStep
-    releaseStepCommand("docker:publish"),       // : ReleaseStep, checks whether `publishTo` is properly set up
+    ReleaseStep(releaseStepTask(publish in Docker)),      // : ReleaseStep, checks whether `publishTo` is properly set up
     setNextVersion,                                       // : ReleaseStep
     commitNextVersion,                                    // : ReleaseStep
     pushChanges                                           // : ReleaseStep, also checks that an upstream branch is properly configured
