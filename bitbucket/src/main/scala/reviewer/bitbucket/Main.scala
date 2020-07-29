@@ -5,20 +5,22 @@ import java.net.URI
 import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
 import akka.stream.scaladsl.{Sink, Source}
 import cats.effect.{ExitCode, IO}
 import cats.implicits._
 import com.monovore.decline.Opts
 import com.monovore.decline.effect._
-import reviewer.bitbucket.algorithm.GatherPullRequestsWithSuccessfulBuilds
+import reviewer.bitbucket.algorithm.{GatherPullRequestsWithSuccessfulBuilds, Merge}
 import reviewer.bitbucket.endpoints.v2
 import reviewer.bitbucket.model.Username
 import sttp.client.akkahttp.AkkaHttpBackend
 import sttp.model.Uri
 import sttp.tapir.client.sttp._
 import sttp.tapir.model.UsernamePassword
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object Main extends CommandIOApp(
   name="reviewer",
@@ -28,20 +30,39 @@ object Main extends CommandIOApp(
 
   import BitbucketOpts._
 
-  override def main: Opts[IO[ExitCode]] = (usernameOpt, passwordEnvVariable, apiBaseUri).mapN {
-    case (username, passwordEnv, uri) => {
-      implicit val actorSystem = ActorSystem("Reviewer")
-      val password = IO.fromEither(sys.env.get(passwordEnv)
-        .toRight(new RuntimeException(s"Could not find password with env variable ${passwordEnv}"))
-      )
-      val usernamePassword = password.map(p => UsernamePassword(username.value, Some(p)))
-      usernamePassword.flatMap(startStream(_, uri))
+  override def main: Opts[IO[ExitCode]] = (dryRun orElse mergeAll).map {
 
-    }.map(_ => ExitCode.Success)
+    case command: RunCommand =>
+      implicit val actorSystem = ActorSystem("Reviewer")
+      implicit val executionContext = ExecutionContext.global
+      val password = IO.fromEither(sys.env.get(command.passwordVariable)
+        .toRight(new RuntimeException(s"Could not find password with env variable ${command.passwordVariable}"))
+      )
+      val usernamePassword = password.map(p => UsernamePassword(command.username.value, Some(p)))
+
+      usernamePassword.flatMap(startStream(_, command.apiBaseUri, sink(command))).guarantee {
+        IO.fromFuture(IO(actorSystem.terminate())) *> IO.unit
+      } *> IO(ExitCode.Success)
+  }
+
+  private def sink(runCommand: RunCommand)(implicit actorSystem: ActorSystem, executionContext: ExecutionContext): Sink[Merge, Future[Done]] = runCommand match {
+    case Run(_, username, passwordVar) =>
+      val password = sys.env.getOrElse(passwordVar, "")
+      Sink.foreachAsync(1) {
+        merge =>
+          Http().singleRequest(
+            HttpRequest(HttpMethods.POST, uri = merge.link)
+              .addHeader(Authorization(BasicHttpCredentials(username.value, password)))
+          )
+          .map(_.discardEntityBytes())
+          .map(_ => println(s"Merged ${merge.link}"))
+      }
+    case DryRun(_, _, _) =>
+      Sink.foreach(println)
   }
 
 
-  private def startStream(usernamePassword: UsernamePassword, baseUri: Uri)(implicit actorSystem: ActorSystem): IO[Done] = {
+  private def startStream(usernamePassword: UsernamePassword, baseUri: Uri, sink: Sink[Merge, Future[Done]])(implicit actorSystem: ActorSystem): IO[Done] = {
     implicit val sttpBackend = AkkaHttpBackend.usingActorSystem(actorSystem)
     val algorithm = new GatherPullRequestsWithSuccessfulBuilds(
       uri => Source.future(Http().singleRequest(HttpRequest(uri = uri).addHeader(
@@ -59,7 +80,7 @@ object Main extends CommandIOApp(
             case Right(o) => o
           }.via(
           algorithm.mergeablePullRequests
-        ).runWith(Sink.foreach(println))
+        ).runWith(sink)
       }
     }
   }
@@ -67,6 +88,16 @@ object Main extends CommandIOApp(
 }
 
 object BitbucketOpts {
+
+  sealed trait RunCommand {
+    def apiBaseUri: Uri
+    def username: Username
+    def passwordVariable: String
+  }
+
+  case class DryRun(apiBaseUri: Uri, username: Username, passwordVariable: String) extends RunCommand
+  case class Run(apiBaseUri: Uri, username: Username, passwordVariable: String) extends RunCommand
+
   val usernameOpt: Opts[Username] = Opts
     .option[String]("username", "The username of the bot to auto-merge its PRs", "u")
     .map(Username)
@@ -78,4 +109,11 @@ object BitbucketOpts {
     .map(URI.create)
     .map(Uri.apply)
 
+  val dryRun = Opts.subcommand[DryRun]("dry-run", "Just display the merge requests that would have been merged") {
+    (apiBaseUri, usernameOpt, passwordEnvVariable).mapN(DryRun)
+  }
+
+  val mergeAll = Opts.subcommand[Run]("merge-all", "Merge all user pull requests automatically if build is successful") {
+    (apiBaseUri, usernameOpt, passwordEnvVariable).mapN(Run)
+  }
 }
