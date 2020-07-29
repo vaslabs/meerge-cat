@@ -39,7 +39,7 @@ val compilerFlags = Seq(
 )
 
 lazy val releaseSettings = Seq(
-  releaseProcess := Seq[ReleaseStep](
+  releaseProcess in ThisBuild := Seq[ReleaseStep](
     checkSnapshotDependencies,                            // : ReleaseStep
     inquireVersions,                                      // : ReleaseStep
     runClean,                                             // : ReleaseStep
