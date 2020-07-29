@@ -1,5 +1,7 @@
 package reviewer.bitbucket.algorithm
 
+import java.nio.charset.StandardCharsets
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpResponse
@@ -79,11 +81,12 @@ sealed trait MergeState {
   def + (mergeState: MergeState): MergeState
 }
 object MergeState {
-  def apply(byteString: ByteString): MergeState =
-    if (byteString.contains(">>>>>>>")) {
+  def apply(byteString: ByteString): MergeState = {
+    if (byteString.decodeString(StandardCharsets.UTF_8).contains(">>>>>>>")) {
       Conflict
     } else
       NoConflict
+  }
 }
 case object Conflict extends MergeState {
   override def +(mergeState: MergeState): MergeState = Conflict

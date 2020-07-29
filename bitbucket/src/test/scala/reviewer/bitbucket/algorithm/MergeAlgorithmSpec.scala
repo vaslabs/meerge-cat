@@ -33,6 +33,15 @@ class MergeAlgorithmSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
     mergeCommand mustBe Some(Merge(mergeUri(mergeablePullRequest.id)))
   }
 
+  "PR with conflict" must "not be allowed" in {
+    val mergeCommandsF =
+      Source.single(PullRequests(List(pullRequestWithConflict), None))
+      .via(algorithm.mergeablePullRequests)
+      .runWith(Sink.headOption[Merge])
+
+    Await.result(mergeCommandsF, 3 seconds) mustBe None
+  }
+
 
 }
 
@@ -62,7 +71,7 @@ object MergeAlgorithmSpec {
   private def textResponse(body: String) = HttpResponse().withEntity(ContentTypes.`text/plain(UTF-8)`, body)
 
   private def codeLine = Random.alphanumeric.take(64).mkString
-  private def conflictLine = ">>>>>>"
+  private def conflictLine = ">>>>>>>"
 
   private def conflictResponse: String =
     List.apply(
@@ -78,9 +87,15 @@ object MergeAlgorithmSpec {
   def href(link: String): Json = Json.obj("href" -> link.asJson)
 
   def mergeablePullRequest = PullRequestSummary(1L, "1", Author("bot"), Json.obj(
-  "diff" -> href(NoConflictUri),
-        "merge" -> href(mergeUri(1L)),
-        "statuses" -> href(BuildStatusSuccess)
+    "diff" -> href(NoConflictUri),
+          "merge" -> href(mergeUri(1L)),
+          "statuses" -> href(BuildStatusSuccess)
+  ))
+
+  def pullRequestWithConflict = PullRequestSummary(2L, "2", Author("bot"), Json.obj(
+    "diff" -> href(ConflictUri),
+    "merge" -> href(mergeUri(2L)),
+    "statuses" -> href(BuildStatusSuccess)
   ))
 
   def mergeUri(id: Long) = s"local://${id}/merge"
