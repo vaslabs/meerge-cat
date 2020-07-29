@@ -16,6 +16,7 @@ lazy val bitbucket = (project in file("bitbucket"))
   .settings(releaseSettings)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
+  .settings(noPublishSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
