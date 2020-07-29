@@ -36,7 +36,7 @@ val compilerFlags = Seq(
   "-Xfatal-warnings"
 )
 
-releaseProcess in ThisBuild := Seq[ReleaseStep](
+releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,                            // : ReleaseStep
   inquireVersions,                                      // : ReleaseStep
   runClean,                                             // : ReleaseStep
