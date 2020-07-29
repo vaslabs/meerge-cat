@@ -13,7 +13,6 @@ lazy val bitbucket = (project in file("bitbucket"))
   .settings(scalacOptions ++= compilerFlags)
   .settings(libraryDependencies ++= Dependencies.modules.bitbucket)
   .enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
-  .settings(releaseSettings)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
 
