@@ -16,7 +16,6 @@ lazy val bitbucket = (project in file("bitbucket"))
   .settings(releaseSettings)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
-  .settings(publishSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -38,21 +37,20 @@ val compilerFlags = Seq(
   "-Xfatal-warnings"
 )
 
-lazy val releaseSettings = Seq(
-  releaseProcess in ThisBuild := Seq[ReleaseStep](
-    checkSnapshotDependencies,                            // : ReleaseStep
-    inquireVersions,                                      // : ReleaseStep
-    runClean,                                             // : ReleaseStep
-    runTest,                                              // : ReleaseStep
-    setReleaseVersion,                                    // : ReleaseStep
-    commitReleaseVersion,                                 // : ReleaseStep, performs the initial git checks
-    tagRelease,                                           // : ReleaseStep
-    ReleaseStep(releaseStepTask(publish in Docker)),      // : ReleaseStep, checks whether `publishTo` is properly set up
-    setNextVersion,                                       // : ReleaseStep
-    commitNextVersion,                                    // : ReleaseStep
-    pushChanges                                           // : ReleaseStep, also checks that an upstream branch is properly configured
-  )
+releaseProcess in ThisBuild := Seq[ReleaseStep](
+  checkSnapshotDependencies,                            // : ReleaseStep
+  inquireVersions,                                      // : ReleaseStep
+  runClean,                                             // : ReleaseStep
+  runTest,                                              // : ReleaseStep
+  setReleaseVersion,                                    // : ReleaseStep
+  commitReleaseVersion,                                 // : ReleaseStep, performs the initial git checks
+  tagRelease,                                           // : ReleaseStep
+  ReleaseStep(releaseStepTask(publish in Docker)),      // : ReleaseStep, checks whether `publishTo` is properly set up
+  setNextVersion,                                       // : ReleaseStep
+  commitNextVersion,                                    // : ReleaseStep
+  pushChanges                                           // : ReleaseStep, also checks that an upstream branch is properly configured
 )
+
 
 lazy val dockerSettings = Seq(
   (packageName in Docker) := "reviewer",
@@ -66,13 +64,4 @@ lazy val universalPackageSettings = Seq(
 
 lazy val noPublishSettings = Seq(
   publish / skip := true
-)
-
-lazy val publishSettings = Seq(
-  publishTo := Some(
-    if (isSnapshot.value) Opts.resolver.sonatypeSnapshots
-    else Opts.resolver.sonatypeStaging
-  ),
-  organization := "org.vaslabs.kube",
-  organizationName := "Vasilis Nicolaou",
 )
