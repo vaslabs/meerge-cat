@@ -14,6 +14,13 @@ object Dependencies {
       val extras = "0.13.0"
     }
 
+    object decline {
+      val core = "1.0.0"
+    }
+
+    object sttp {
+      val core = "2.2.3"
+    }
     object tapir {
       val core = "0.16.9"
     }
@@ -36,9 +43,19 @@ object Dependencies {
       ).map(_ % version.circe.core)
       val extras = "io.circe" %% "circe-generic-extras" % version.circe.extras
     }
+
+    object decline {
+      val core = "com.monovore" %% "decline" % version.decline.core
+      val catsEffect = "com.monovore" %% "decline-effect" % version.decline.core
+    }
+
+    object sttp {
+      val akkaBackend = "com.softwaremill.sttp.client" %% "akka-http-backend" % version.sttp.core
+    }
     object tapir {
       val core = "com.softwaremill.sttp.tapir" %% "tapir-core" % version.tapir.core
       val circe = "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % version.tapir.core
+      val sttpClient = "com.softwaremill.sttp.tapir" %% "tapir-sttp-client" % version.tapir.core
     }
 
     object test {
@@ -54,8 +71,12 @@ object Dependencies {
         akka.http,
         akka.circeSupport,
         circe.extras,
-        tapir.core,
+        decline.catsEffect,
+        decline.core,
+        sttp.akkaBackend,
         tapir.circe,
+        tapir.core,
+        tapir.sttpClient,
         test.scalatest
       )
   }

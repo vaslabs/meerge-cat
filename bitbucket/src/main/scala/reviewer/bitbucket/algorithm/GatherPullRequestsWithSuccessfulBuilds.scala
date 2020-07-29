@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -29,6 +29,7 @@ class GatherPullRequestsWithSuccessfulBuilds(httpClient: String => Source[HttpRe
   }.flatMapConcat{
     case (uri, summary) =>
         httpClient(uri)
+        .filter(_.status == StatusCodes.OK)
         .map(_.entity.httpEntity)
         .mapAsync(1)(
           jsonUnmarshaller.apply
