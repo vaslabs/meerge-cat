@@ -43,6 +43,27 @@ class MergeAlgorithmSpec extends AnyFlatSpec with Matchers with BeforeAndAfterAl
   }
 
 
+  "PR with failed build" must "not be allowed" in {
+    val mergeCommandsF =
+      Source.single(PullRequests(List(pullRequestWithFailedBuild, pullRequestWithNoStatuses), None))
+        .via(algorithm.mergeablePullRequests)
+        .runWith(Sink.headOption[Merge])
+
+    Await.result(mergeCommandsF, 3 seconds) mustBe None
+  }
+
+  it must "pick only PRs with successful builds and no conflicts" in {
+    val mergeCommandsF =
+      Source.single(PullRequests(List(mergeablePullRequest, pullRequestWithConflict), None))
+        .via(algorithm.mergeablePullRequests)
+        .runWith(Sink.collection[Merge, List[Merge]])
+
+    val mergeCommand = Await.result(mergeCommandsF, 3 seconds)
+
+    mergeCommand mustBe List(Merge(mergeUri(mergeablePullRequest.id)))
+  }
+
+
 }
 
 object MergeAlgorithmSpec {
@@ -96,6 +117,19 @@ object MergeAlgorithmSpec {
     "diff" -> href(ConflictUri),
     "merge" -> href(mergeUri(2L)),
     "statuses" -> href(BuildStatusSuccess)
+  ))
+
+  def pullRequestWithFailedBuild = PullRequestSummary(3L, "3", Author("bot"), Json.obj(
+    "diff" -> href(NoConflictUri),
+    "merge" -> href(mergeUri(2L)),
+    "statuses" -> href(BuildStatusFailure)
+  ))
+
+
+  def pullRequestWithNoStatuses = PullRequestSummary(3L, "3", Author("bot"), Json.obj(
+    "diff" -> href(NoConflictUri),
+    "merge" -> href(mergeUri(2L)),
+    "statuses" -> href(EmptyStatus)
   ))
 
   def mergeUri(id: Long) = s"local://${id}/merge"

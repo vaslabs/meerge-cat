@@ -25,9 +25,7 @@ class GatherPullRequestsWithSuccessfulBuilds(httpClient: String => Source[HttpRe
       .map(_ -> summary)
   }
   .collect {
-    case Some(o) =>
-      println(s"Found PR ${o}")
-      o
+    case Some(o) => o
   }.flatMapConcat{
     case (uri, summary) =>
         httpClient(uri)
