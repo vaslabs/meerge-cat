@@ -1,6 +1,5 @@
 name := "reviewer"
 
-version := "0.1"
 
 scalaVersion in ThisBuild := "2.13.3"
 import ReleaseTransformations._
