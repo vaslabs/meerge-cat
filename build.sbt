@@ -38,7 +38,7 @@ val compilerFlags = Seq(
 )
 
 val releaseSettings = Seq(
-  releaseProcess in ThisBuild := Seq[ReleaseStep](
+  releaseProcess in ThisProject := Seq[ReleaseStep](
     checkSnapshotDependencies,                            // : ReleaseStep
     inquireVersions,                                      // : ReleaseStep
     runClean,                                             // : ReleaseStep
