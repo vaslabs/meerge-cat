@@ -16,6 +16,7 @@ lazy val bitbucket = (project in file("bitbucket"))
   .settings(releaseSettings)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
+  .settings(publishSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -66,4 +67,13 @@ lazy val universalPackageSettings = Seq(
 
 lazy val noPublishSettings = Seq(
   publish / skip := true
+)
+
+lazy val publishSettings = Seq(
+  publishTo := Some(
+    if (isSnapshot.value) Opts.resolver.sonatypeSnapshots
+    else Opts.resolver.sonatypeStaging
+  ),
+  organization := "org.vaslabs.kube",
+  organizationName := "Vasilis Nicolaou",
 )
