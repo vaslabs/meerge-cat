@@ -3,15 +3,19 @@ name := "reviewer"
 version := "0.1"
 
 scalaVersion := "2.13.3"
-
+import ReleaseTransformations._
 
 lazy val reviewer = (project in file("."))
   .aggregate(bitbucket)
+  .settings(noPublishSettings)
 
 lazy val bitbucket = (project in file("bitbucket"))
   .settings(scalacOptions ++= compilerFlags)
   .settings(libraryDependencies ++= Dependencies.modules.bitbucket)
-
+  .enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
+  .settings(releaseSettings)
+  .settings(dockerSettings)
+  .settings(universalPackageSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -31,4 +35,34 @@ val compilerFlags = Seq(
   "-Ywarn-value-discard",               // Warn when non-Unit expression results are unused.
   "-Ywarn-unused:imports",
   "-Xfatal-warnings"
+)
+
+val releaseSettings = Seq(
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,                            // : ReleaseStep
+    inquireVersions,                                      // : ReleaseStep
+    runClean,                                             // : ReleaseStep
+    runTest,                                              // : ReleaseStep
+    setReleaseVersion,                                    // : ReleaseStep
+    commitReleaseVersion,                                 // : ReleaseStep, performs the initial git checks
+    tagRelease,                                           // : ReleaseStep
+    releaseStepCommand("docker:publish"),       // : ReleaseStep, checks whether `publishTo` is properly set up
+    setNextVersion,                                       // : ReleaseStep
+    commitNextVersion,                                    // : ReleaseStep
+    pushChanges                                           // : ReleaseStep, also checks that an upstream branch is properly configured
+  )
+)
+
+lazy val dockerSettings = Seq(
+  (packageName in Docker) := "reviewer",
+  dockerBaseImage := "openjdk:14-jdk-alpine3.10",
+  dockerUsername := Some("vaslabs")
+)
+
+lazy val universalPackageSettings = Seq(
+  name in Universal := "reviewer"
+)
+
+lazy val noPublishSettings = Seq(
+  publish / skip := true
 )
