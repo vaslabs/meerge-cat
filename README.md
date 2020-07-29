@@ -1,5 +1,7 @@
 # reviewer-bot
 
+![Build and Test](https://github.com/vaslabs/reviewer-bot/workflows/Scala%20CI/badge.svg)
+
 A bot that reviews PRs of other bots and merges them automatically if they passed build
 
 
