@@ -40,6 +40,7 @@ releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,                            // : ReleaseStep
   inquireVersions,                                      // : ReleaseStep
   runClean,                                             // : ReleaseStep
+  runTest,
   setReleaseVersion,                                    // : ReleaseStep
   commitReleaseVersion,                                 // : ReleaseStep, performs the initial git checks
   tagRelease,                                           // : ReleaseStep
