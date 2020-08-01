@@ -1,4 +1,4 @@
-# reviewer-bot
+# Meerge cat
 
 ![Build and Test](https://github.com/vaslabs/meerge-cat/workflows/Scala%20CI/badge.svg)
 
