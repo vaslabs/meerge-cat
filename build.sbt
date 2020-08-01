@@ -83,7 +83,6 @@ lazy val siteSettings = Seq(
   micrositeName := "Meerge Cat",
   micrositeDescription := "Portable bot for auto-merging PRs",
   micrositeUrl := "https://meergecat.vaslabs.io",
-  micrositeBaseUrl := "/",
   micrositeTwitter := "@vaslabs",
   micrositeTwitterCreator := "@vaslabs",
   micrositeGithubOwner := "vaslabs",
