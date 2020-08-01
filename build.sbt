@@ -5,7 +5,7 @@ scalaVersion in ThisBuild := "2.13.3"
 import ReleaseTransformations._
 import microsites.ExtraMdFileConfig
 
-lazy val reviewer = (project in file("."))
+lazy val `meerge-cat` = (project in file("."))
   .aggregate(bitbucket)
   .settings(noPublishSettings)
 
