@@ -1,6 +1,7 @@
 # Meerge cat
 
-![Build and Test](https://github.com/vaslabs/meerge-cat/workflows/Scala%20CI/badge.svg)
+![Publish Docker](https://github.com/vaslabs/meerge-cat/workflows/Publish%20Docker/badge.svg)
+[![Docker Pulls](https://img.shields.io/docker/pulls/vaslabs/meerge-cat.svg?style=flat&color=blue)](https://hub.docker.com/r/vaslabs/meerge-cat/)
 
 ![logo](https://github.com/vaslabs/reviewer-bot/raw/master/images/reviewerbot_256x256.png)
 
@@ -14,7 +15,7 @@ This is a work in progress
 
 #### Dry run: Display all PRs that can be auto-merged
 ```
-docker run -e BITBUCKET_TOKEN vaslabs/reviewer:0.0.2\
+docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      dry-run\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\
@@ -22,7 +23,7 @@ docker run -e BITBUCKET_TOKEN vaslabs/reviewer:0.0.2\
  ```
  #### Merge all: successful PRs successful build
  ```
-docker run -e BITBUCKET_TOKEN vaslabs/reviewer:0.0.2\
+docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      merge-all\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\

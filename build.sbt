@@ -1,8 +1,9 @@
-name := "reviewer"
+name := "meerge-cat"
 
 
 scalaVersion in ThisBuild := "2.13.3"
 import ReleaseTransformations._
+import microsites.ExtraMdFileConfig
 
 lazy val reviewer = (project in file("."))
   .aggregate(bitbucket)
@@ -14,6 +15,11 @@ lazy val bitbucket = (project in file("bitbucket"))
   .enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
+
+lazy val site = (project in file("site"))
+  .enablePlugins(MicrositesPlugin)
+  .settings(noPublishSettings)
+  .settings(siteSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -51,15 +57,43 @@ releaseProcess := Seq[ReleaseStep](
 
 
 lazy val dockerSettings = Seq(
-  (packageName in Docker) := "reviewer",
+  (packageName in Docker) := "meerge-cat",
   dockerBaseImage := "openjdk:14-jdk-alpine3.10",
   dockerUsername := Some("vaslabs")
 )
 
 lazy val universalPackageSettings = Seq(
-  name in Universal := "reviewer"
+  name in Universal := "meerge-cat",
+  licenses := List("Apache 2.0" -> new URL("https://opensource.org/licenses/Apache-2.0"))
 )
 
 lazy val noPublishSettings = Seq(
   publish / skip := true
+)
+
+lazy val githubToken = sys.env.get("GITHUB_TOKEN")
+lazy val siteSettings = Seq(
+  micrositeName := "Meerge Cat",
+  micrositeDescription := "Portable bot for auto-merging PRs",
+  micrositeUrl := "https://meergecat.vaslabs.io",
+  micrositeBaseUrl := "/",
+  micrositeTwitter := "@vaslabs",
+  micrositeTwitterCreator := "@vaslabs",
+  micrositeGithubOwner := "vaslabs",
+  micrositeGithubRepo := "meerge-cat",
+  micrositeAuthor := "Vasilis Nicolaou",
+  micrositeGithubToken := githubToken,
+  micrositePushSiteWith := githubToken.map(_ => GitHub4s).getOrElse(GHPagesPlugin),
+  micrositeGitterChannel := false,
+  micrositeExtraMdFiles := Map(
+    file("README.md") -> ExtraMdFileConfig(
+      "index.md",
+      "home",
+      Map("section" -> "home", "position" -> "0", "permalink" -> "/")
+    )
+  ),
+  excludeFilter in ghpagesCleanSite :=
+    new FileFilter{
+      def accept(f: File) = (ghpagesRepository.value / "CNAME").getCanonicalPath == f.getCanonicalPath
+    } || "versions.html"
 )
