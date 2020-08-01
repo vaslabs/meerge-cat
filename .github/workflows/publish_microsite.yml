@@ -11,9 +11,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      - uses: helaili/jekyll-action@2.0.1
       - name: Publish
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
+          apt-get install gem
+          apt-get install jekyll
           sbt site/publishMicrosite
