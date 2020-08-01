@@ -1,4 +1,4 @@
-name: Publish Docker
+name: Publish microsite
 on:
   push:
     branches: [ master ]
@@ -11,7 +11,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      - name: Release
+      - name: Publish
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
