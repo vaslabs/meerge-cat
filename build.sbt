@@ -15,11 +15,13 @@ lazy val bitbucket = (project in file("bitbucket"))
   .enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
+  .settings(licenseSettings)
 
 lazy val site = (project in file("site"))
   .enablePlugins(MicrositesPlugin)
   .settings(noPublishSettings)
   .settings(siteSettings)
+  .settings(licenseSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -63,8 +65,13 @@ lazy val dockerSettings = Seq(
 )
 
 lazy val universalPackageSettings = Seq(
-  name in Universal := "meerge-cat",
-  licenses := List("Apache 2.0" -> new URL("https://opensource.org/licenses/Apache-2.0"))
+  name in Universal := "meerge-cat"
+)
+
+lazy val licenseSettings = Seq(
+  licenses := List("Apache 2.0" -> new URL("https://opensource.org/licenses/Apache-2.0")),
+  homepage := Some(url("https://git.vaslabs.org/vaslabs/sbt-kubeyml")),
+  startYear := Some(2020)
 )
 
 lazy val noPublishSettings = Seq(
