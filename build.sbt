@@ -1,12 +1,14 @@
-name := "reviewer"
+name := "meerge-cat"
 
 
 scalaVersion in ThisBuild := "2.13.3"
 import ReleaseTransformations._
+import microsites.ExtraMdFileConfig
 
-lazy val reviewer = (project in file("."))
+lazy val `meerge-cat` = (project in file("."))
   .aggregate(bitbucket)
   .settings(noPublishSettings)
+  .settings(licenseSettings)
 
 lazy val bitbucket = (project in file("bitbucket"))
   .settings(scalacOptions ++= compilerFlags)
@@ -14,6 +16,13 @@ lazy val bitbucket = (project in file("bitbucket"))
   .enablePlugins(DockerPlugin, JavaAppPackaging, AshScriptPlugin)
   .settings(dockerSettings)
   .settings(universalPackageSettings)
+  .settings(licenseSettings)
+
+lazy val site = (project in file("site"))
+  .enablePlugins(MicrositesPlugin)
+  .settings(noPublishSettings)
+  .settings(siteSettings)
+  .settings(licenseSettings)
 
 val compilerFlags = Seq(
   "-deprecation",
@@ -51,15 +60,47 @@ releaseProcess := Seq[ReleaseStep](
 
 
 lazy val dockerSettings = Seq(
-  (packageName in Docker) := "reviewer",
+  (packageName in Docker) := "meerge-cat",
   dockerBaseImage := "openjdk:14-jdk-alpine3.10",
   dockerUsername := Some("vaslabs")
 )
 
 lazy val universalPackageSettings = Seq(
-  name in Universal := "reviewer"
+  name in Universal := "meerge-cat"
+)
+
+lazy val licenseSettings = Seq(
+  licenses := List("Apache 2.0" -> new URL("https://opensource.org/licenses/Apache-2.0")),
+  homepage := Some(url("https://git.vaslabs.org/vaslabs/sbt-kubeyml")),
+  startYear := Some(2020)
 )
 
 lazy val noPublishSettings = Seq(
   publish / skip := true
+)
+
+lazy val githubToken = sys.env.get("GITHUB_TOKEN")
+lazy val siteSettings = Seq(
+  micrositeName := "Meerge Cat",
+  micrositeDescription := "Portable bot for auto-merging PRs",
+  micrositeUrl := "https://meergecat.vaslabs.io",
+  micrositeTwitter := "@vaslabs",
+  micrositeTwitterCreator := "@vaslabs",
+  micrositeGithubOwner := "vaslabs",
+  micrositeGithubRepo := "meerge-cat",
+  micrositeAuthor := "Vasilis Nicolaou",
+  micrositeGithubToken := githubToken,
+  micrositePushSiteWith := githubToken.map(_ => GitHub4s).getOrElse(GHPagesPlugin),
+  micrositeGitterChannel := false,
+  micrositeExtraMdFiles := Map(
+    file("README.md") -> ExtraMdFileConfig(
+      "index.md",
+      "home",
+      Map("section" -> "home", "position" -> "0", "permalink" -> "/")
+    )
+  ),
+  excludeFilter in ghpagesCleanSite :=
+    new FileFilter{
+      def accept(f: File) = (ghpagesRepository.value / "CNAME").getCanonicalPath == f.getCanonicalPath
+    } || "versions.html"
 )
