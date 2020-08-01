@@ -8,6 +8,7 @@ import microsites.ExtraMdFileConfig
 lazy val `meerge-cat` = (project in file("."))
   .aggregate(bitbucket)
   .settings(noPublishSettings)
+  .settings(licenseSettings)
 
 lazy val bitbucket = (project in file("bitbucket"))
   .settings(scalacOptions ++= compilerFlags)
