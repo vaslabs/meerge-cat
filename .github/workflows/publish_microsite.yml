@@ -11,9 +11,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 14
+      - uses:  lemonarc/jekyll-action@1.0.0
       - name: Publish
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          apt-get install jekyll
           sbt site/publishMicrosite
