@@ -1,6 +1,6 @@
 # reviewer-bot
 
-![Build and Test](https://github.com/vaslabs/reviewer-bot/workflows/Scala%20CI/badge.svg)
+![Build and Test](https://github.com/vaslabs/meerge-cat/workflows/Scala%20CI/badge.svg)
 
 ![logo](https://github.com/vaslabs/reviewer-bot/raw/master/images/reviewerbot_256x256.png)
 
