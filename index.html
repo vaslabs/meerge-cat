@@ -13,14 +13,17 @@
 <h3 id="usage">Usage</h3>
 
 <h4 id="dry-run-display-all-prs-that-can-be-auto-merged">Dry run: Display all PRs that can be auto-merged</h4>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      dry-run\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\
      --api-uri https://api.bitbucket.org/2.0
 </code></pre></div></div>
+
 <p>#### Merge all: successful PRs successful build</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      merge-all\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\
@@ -39,7 +42,16 @@
 
 <h3 id="second-release">Second release</h3>
 
-<p>Plan after first release</p>
+<p>Generic customisation for:</p>
+<ul>
+  <li>Scanning PRs</li>
+  <li>Setting up a different author</li>
+  <li>Configureable status</li>
+</ul>
+
+<h3 id="third-release">Third release</h3>
+
+<p>Plan after second release</p>
 
 </div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><p>Meerge Cat is designed and developed by <a href="https://git.vaslabs.org/vaslabs/sbt-kubeyml" target="_blank" rel="noopener noreferrer">Vasilis Nicolaou</a></p></div><div class="row"><div><p>Website built with <a href="https://47degrees.github.io/sbt-microsites/" target="_blank" rel="noopener noreferrer">sbt-microsites</a> - © 2019 <a href="https://www.47deg.com/" target="_blank" rel="noopener noreferrer">47 Degrees</a></p></div></div></div></footer><script src="/highlight/highlight.pack.js"></script><script>
 // For all code blocks, copy the language from the containing div
