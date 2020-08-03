@@ -14,6 +14,7 @@ This is a work in progress
 ### Usage
 
 #### Dry run: Display all PRs that can be auto-merged
+
 ```
 docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      dry-run\
@@ -21,7 +22,9 @@ docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      --password-env BITBUCKET_TOKEN\
      --api-uri https://api.bitbucket.org/2.0
  ```
+ 
  #### Merge all: successful PRs successful build
+ 
  ```
 docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      merge-all\
@@ -40,4 +43,11 @@ Pass the name of the author and credentials. The bot will scan bitbucket and try
 
 ### Second release
 
-Plan after first release
+Generic customisation for:
+- Scanning PRs
+- Setting up a different author
+- Configureable status
+
+### Third release
+
+Plan after second release
