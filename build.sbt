@@ -98,9 +98,5 @@ lazy val siteSettings = Seq(
       "home",
       Map("section" -> "home", "position" -> "0", "permalink" -> "/")
     )
-  ),
-  excludeFilter in ghpagesCleanSite :=
-    new FileFilter{
-      def accept(f: File) = (ghpagesRepository.value / "CNAME").getCanonicalPath == f.getCanonicalPath
-    } || "versions.html"
+  )
 )
