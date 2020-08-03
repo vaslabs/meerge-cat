@@ -14,7 +14,7 @@
 
 <h4 id="dry-run-display-all-prs-that-can-be-auto-merged">Dry run: Display all PRs that can be auto-merged</h4>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      dry-run\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\
@@ -23,7 +23,7 @@
 
 <p>#### Merge all: successful PRs successful build</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -e BITBUCKET_TOKEN vaslabs/meerge-cat:0.0.7\
      merge-all\
      --username ${BITBUCKET_USERNAME}\
      --password-env BITBUCKET_TOKEN\
