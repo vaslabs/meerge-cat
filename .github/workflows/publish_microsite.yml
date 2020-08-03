@@ -15,5 +15,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
-          sudo apt-get install jekyll
+          sudo apt-get install gem
+          sudo gem install jekyll -v 4
           sbt site/publishMicrosite
