@@ -26,6 +26,7 @@ object Dependencies {
     }
 
     val scalatest = "3.2.0"
+    val pureconfig = "0.13.0"
   }
 
   object library {
@@ -48,6 +49,8 @@ object Dependencies {
       val core = "com.monovore" %% "decline" % version.decline.core
       val catsEffect = "com.monovore" %% "decline-effect" % version.decline.core
     }
+
+    val pureconfig = "com.github.pureconfig" %% "pureconfig" % version.pureconfig
 
     object sttp {
       val akkaBackend = "com.softwaremill.sttp.client" %% "akka-http-backend" % version.sttp.core
@@ -73,6 +76,7 @@ object Dependencies {
         circe.extras,
         decline.catsEffect,
         decline.core,
+        pureconfig,
         sttp.akkaBackend,
         tapir.circe,
         tapir.core,

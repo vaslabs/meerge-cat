@@ -5,6 +5,8 @@ import java.net.URI
 import io.circe.Json
 
 case class Username(value: String)
+case class Workspace(value: String)
+case class RepoSlug(value: String)
 
 case class PullRequests(values: List[PullRequestSummary], next: Option[URI])
 

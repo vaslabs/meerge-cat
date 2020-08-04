@@ -2,7 +2,7 @@ package reviewer.bitbucket
 
 import java.net.URI
 
-import akka.Done
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.headers._
@@ -12,15 +12,18 @@ import cats.effect.{ExitCode, IO}
 import cats.implicits._
 import com.monovore.decline.Opts
 import com.monovore.decline.effect._
+import com.typesafe.config.Config
 import reviewer.bitbucket.algorithm.{GatherPullRequestsWithSuccessfulBuilds, Merge}
 import reviewer.bitbucket.endpoints.v2
-import reviewer.bitbucket.model.Username
+import reviewer.bitbucket.model.{PullRequests, Username}
 import sttp.client.akkahttp.AkkaHttpBackend
 import sttp.model.Uri
 import sttp.tapir.client.sttp._
 import sttp.tapir.model.UsernamePassword
 
 import scala.concurrent.{ExecutionContext, Future}
+import pureconfig._
+import pureconfig.generic.auto._
 
 object Main extends CommandIOApp(
   name="reviewer",
@@ -84,6 +87,23 @@ object Main extends CommandIOApp(
       }
     }
   }
+
+  private def pullRequestsFromConfig(
+          config: BitbucketConfig,
+          usernamePassword: UsernamePassword,
+          baseUri: Uri)(implicit backend: AkkaHttpBackend): Source[PullRequests, NotUsed] =
+    Source(config.repositories).flatMapConcat {
+      repo =>
+        Source.future {
+          val request = v2.repoPullRequests.toSttpRequestUnsafe(baseUri)
+            .apply(usernamePassword, repo.workspace, repo.repoSlug)
+          request.send()
+        }
+    }.map(_.body)
+      .collect {
+        case Right(o) =>
+          o
+      }
 
 }
 

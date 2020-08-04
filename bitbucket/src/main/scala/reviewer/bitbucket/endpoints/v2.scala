@@ -3,7 +3,7 @@ package reviewer.bitbucket.endpoints
 import java.net.URI
 
 import io.circe.{Decoder, Encoder}
-import reviewer.bitbucket.model.{Build, PullRequests, Status, Unknown, Username}
+import reviewer.bitbucket.model.{Build, PullRequests, RepoSlug, Status, Unknown, Username, Workspace}
 import sttp.model.StatusCode
 import sttp.tapir._
 import sttp.tapir.json.circe._
@@ -22,6 +22,13 @@ object v2 {
       .get
       .in(auth.basic[UsernamePassword])
       .in("pullrequests" / path[Username])
+      .out(jsonBody[PullRequests])
+      .errorOut(statusCode(StatusCode.NotFound))
+
+  val repoPullRequests: Endpoint[(UsernamePassword, Workspace, RepoSlug), Unit, PullRequests, Nothing] =
+    endpoint.get
+      .in(auth.basic[UsernamePassword])
+      .in("repositories" /path[Workspace] / path[RepoSlug] )
       .out(jsonBody[PullRequests])
       .errorOut(statusCode(StatusCode.NotFound))
 
@@ -54,4 +61,10 @@ object schema {
 object codecs {
   implicit val usernameCodec: Codec[String, Username, CodecFormat.TextPlain] =
     Codec.string.map(Username)(_.value)
+
+  implicit val workspaceCodec: Codec[String, Workspace, CodecFormat.TextPlain] =
+    Codec.string.map(Workspace)(_.value)
+
+  implicit val repoSlugCodec: Codec[String, RepoSlug, CodecFormat.TextPlain] =
+    Codec.string.map(RepoSlug)(_.value)
 }
