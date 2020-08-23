@@ -14,7 +14,9 @@ jobs:
     steps:
       - name: Launch Scala Steward
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.SCALA_STEWARD}}
         uses: scala-steward-org/scala-steward-action@v2
         with:
           github-token: $GITHUB_TOKEN
+          author-email: $GITHUB_ACTOR@@users.noreply.github.com
+          author-name: $GITHUB_ACTOR
