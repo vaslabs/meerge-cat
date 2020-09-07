@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.stream.scaladsl.Framing.FramingException
 import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -55,6 +56,7 @@ class GatherPullRequestsWithSuccessfulBuilds(httpClient: String => Source[HttpRe
       Flow[PullRequestSummary].flatMapConcat { summary =>
         val diffUri = root.diff.href.string.getOption(summary.links)
         diffUri.fold(Source.empty[HttpResponse]) { diffUri =>
+          println(s"Checking ${diffUri} for conflicts")
           httpClient(diffUri)
         }.via(checkDiffBodyForConflicts)
           .collect {
@@ -65,14 +67,18 @@ class GatherPullRequestsWithSuccessfulBuilds(httpClient: String => Source[HttpRe
 
   private lazy val checkDiffBodyForConflicts: Flow[HttpResponse, MergeState, NotUsed] = Flow[HttpResponse]
     .map(_.entity.httpEntity)
-    .flatMapConcat {
-      _.dataBytes
+    .flatMapConcat { entity =>
+      entity.dataBytes
         .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = 256, true))
         .fold[MergeState](NoConflict) {
           case (state, next) =>
             state + MergeState(next)
-        }
+        }.recover {
+        case _: FramingException =>
+          println(s"Long line of code ${entity.httpEntity} detected, skipping")
+          Conflict
     }
+  }
 
 }
 
