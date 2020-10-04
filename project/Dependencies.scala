@@ -6,7 +6,7 @@ object Dependencies {
     object akka {
       val main = "2.6.8"
       val http = "10.2.0"
-      val circeSupport = "1.34.0"
+      val circeSupport = "1.35.0"
     }
 
     object circe {
