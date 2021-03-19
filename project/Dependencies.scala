@@ -25,7 +25,7 @@ object Dependencies {
       val core = "0.16.9"
     }
 
-    val scalatest = "3.2.2"
+    val scalatest = "3.2.3"
   }
 
   object library {
